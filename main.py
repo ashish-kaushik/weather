@@ -113,28 +113,6 @@ class weather:
             print("Weather Description: ", description[i])
             print("\n")
 
-# class userInput:
-#
-#     def __init__(self):
-#         print("")
-#
-#     def prompt_again(self, first_time):
-#
-#         while True and not first_time:
-#             try:
-#                 continue_response = str.lower(input("Would you like to check weather for another zip code: "))
-#             except ValueError:
-#                 print("ERROR: This value is not allowed. Please try again. Enter the word YES or NO.")
-#                 continue
-#             else:
-#                 if continue_response != "yes" and continue_response != "no":
-#                     print("ERROR: This value is not allowed. Please try again. Enter the word YES or NO.")
-#                     continue
-#                 elif continue_response == "no":
-#                     sys.exit()
-#                 elif continue_response == "yes":
-#                     return
-
 
 if __name__ == '__main__':
 
