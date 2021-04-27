@@ -1,10 +1,10 @@
 
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 from datetime import datetime, timedelta
 import json
 import sys
-import signal
-import time
+
 
 
 class weather:
@@ -34,7 +34,13 @@ class weather:
 
     # method for getting json response
     def get_json(self, req):
-        response = urlopen(req)
+
+        try:
+            response = urlopen(req)
+        except HTTPError as error:
+            if error.code == 404:
+                return None
+
         response_json = json.loads(response.read())
         return response_json
 
@@ -85,13 +91,14 @@ class weather:
                 curr_response = (response_json["weather"])[0]  # list under the weather key for the same day
             else:
                 curr_response = (response_json["weather"])[1]  # list under the weather key for the next day
-            index = int(next_hours_time[n] / 300) + 1
+            index = int(next_hours_time[n] / 300) + 1  # index of the n hour to get the hour from "hourly" key
             hourly_response = curr_response["hourly"][index]  # list under the hourly key
             temperature[n] = float(hourly_response["tempF"])
             feels_like_temp[n] = float(hourly_response["FeelsLikeF"])
             description[n] = hourly_response["weatherDesc"][0]["value"]
 
         return (temperature, feels_like_temp, description)
+
 
 
     # parsing json for weather forecast for a number of hours and displaying the result
@@ -112,6 +119,16 @@ class weather:
             print("Feels Like Temperature in Fahrenheit: ", feels_like_temp[i], self.get_emoji(feels_like_temp[i]))
             print("Weather Description: ", description[i])
             print("\n")
+    # method to check if the zip belongs to the US
+    def is_zip_us(self, response_json):
+        curr_response = (response_json["nearest_area"])[0]  # list under nearest area key
+        country = (curr_response["country"][0])["value"]
+        if country == "United States of America":
+            return True
+        else:
+            return False
+
+
 
 
 if __name__ == '__main__':
@@ -119,6 +136,7 @@ if __name__ == '__main__':
     num_hours = 3
     first_time = True
     weather = weather()
+    response = ""
     Timeout = 30
 
     while True:
@@ -134,6 +152,7 @@ if __name__ == '__main__':
                     print("ERROR: This value is not allowed. Please try again. Enter the word YES or NO.")
                     continue
                 elif continue_response == "no":
+                    print("Thank you for using this application.")
                     sys.exit()
                 elif continue_response == "yes":
                     break
@@ -154,13 +173,20 @@ if __name__ == '__main__':
                     print("ERROR: This value is not allowed. Please enter a valid 5 Digit US ZIP CODE.")
                     continue
                 else:
-                    break
+                    req = weather.form_req(zip_code)
+                    response = weather.get_json(req)
+                    if response == None:    # checking if the zip exists
+                        print("ERROR: zip located in Mars. Please enter a zip on Earth.")
+                        continue
+                    elif not weather.is_zip_us(response):  # checking if the zip is in US
+                        print("ERROR: This zip is not in US. Please enter a valid 5 Digit US ZIP CODE.")
+                        continue
+                    else:
+                        break
 
+
+        weather.get_curr_details(response)  # current weather conditions
         first_time = False
-
-        req = weather.form_req(zip_code)
-        response = weather.get_json(req)
-        weather.get_curr_details(response)
 
         # prompting the user if they want the future forecast as well
         while True:
