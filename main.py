@@ -3,6 +3,8 @@ from urllib.request import Request, urlopen
 from datetime import datetime, timedelta
 import json
 import sys
+import signal
+import time
 
 
 class weather:
@@ -27,7 +29,7 @@ class weather:
 
     # method for forming the request
     def form_req(self, pin):
-        req = Request('http://wttr.in/%s?format=j1'%pin)
+        req = Request('http://wttr.in/:%s?format=j1'%pin)
         return req
 
     # method for getting json response
@@ -43,7 +45,6 @@ class weather:
 
     # parsing json for current weather conditions
     def get_curr_details(self, response_json):
-
         curr_response = (response_json["current_condition"])[0]  # list under current condition key
         curr_temp_F = float(curr_response["temp_F"])  # current temperature
         feels_like_temp_F = float(curr_response["FeelsLikeF"])  # feels like temperature
@@ -112,12 +113,35 @@ class weather:
             print("Weather Description: ", description[i])
             print("\n")
 
+# class userInput:
+#
+#     def __init__(self):
+#         print("")
+#
+#     def prompt_again(self, first_time):
+#
+#         while True and not first_time:
+#             try:
+#                 continue_response = str.lower(input("Would you like to check weather for another zip code: "))
+#             except ValueError:
+#                 print("ERROR: This value is not allowed. Please try again. Enter the word YES or NO.")
+#                 continue
+#             else:
+#                 if continue_response != "yes" and continue_response != "no":
+#                     print("ERROR: This value is not allowed. Please try again. Enter the word YES or NO.")
+#                     continue
+#                 elif continue_response == "no":
+#                     sys.exit()
+#                 elif continue_response == "yes":
+#                     return
+
 
 if __name__ == '__main__':
 
     num_hours = 3
     first_time = True
     weather = weather()
+    Timeout = 30
 
     while True:
         # prompting the user if they want to check weather for another zip code
