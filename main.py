@@ -91,7 +91,7 @@ class weather:
                 curr_response = (response_json["weather"])[0]  # list under the weather key for the same day
             else:
                 curr_response = (response_json["weather"])[1]  # list under the weather key for the next day
-            index = int(next_hours_time[n] / 300) + 1  # index of the n hour to get the hour from "hourly" key
+            index = int( next_hours_time[n] / 300)  # index of the n hour to get the hour from "hourly" key
             hourly_response = curr_response["hourly"][index]  # list under the hourly key
             temperature[n] = float(hourly_response["tempF"])
             feels_like_temp[n] = float(hourly_response["FeelsLikeF"])
